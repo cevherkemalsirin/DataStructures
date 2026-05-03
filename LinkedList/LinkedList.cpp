@@ -182,7 +182,80 @@ public:
 		}
 	}
 
-	
+	void SwapPairs()
+	{
+		for (Node<T>* current = head; current; current = current->next)
+		{
+			if (!current->next)
+			{
+				return;
+			}
+			std::swap(current->data, current->next->data);
+			current = current->next;
+		}
+	}
+	//1 2 3 4 5 6 
+	void Reverse()
+	{
+		/* it just changes data we want to swap adresses
+		for (int i = 0; i < length / 2; ++i)
+		{
+			Node<T>* nodeFront = Get_nth(i + 1);
+			Node<T>* nodeBack = Get_nth_Back(i + 1);
+			std::swap(nodeFront->data, nodeBack->data);
+		}*/
+
+		for (int i = 1; i < length; ++i)
+		{
+			Node<T>* nodeBack = Get_nth_Back(i);
+			Node<T>* nodeBackPrev = Get_nth_Back(i + 1);
+			nodeBack->next = nodeBackPrev;
+			nodeBackPrev->next = nullptr;
+		}
+		std::swap(head, tail);
+	}
+
+	void DeleteEvenPositions()
+	{
+		int i = 1;
+		int realIndex = 1;
+		for (Node<T>* current = head; current;++realIndex,++i)
+		{
+			if (realIndex % 2 == 0)
+			{
+				current = current->next;
+				Delete_nth(i);
+				--i;
+				continue;
+			}
+			current = current->next;
+		}
+	}
+
+	void InsertSorted(T data)
+	{
+		Node<T>* newNode = new Node<T>(data);
+		if (!head || data < head->data)
+		{
+			InsertFront(data);
+			return;
+		}
+		Node<T>* prevCurrent = head;
+		for (Node<T>* current = head->next; current; current = current->next)
+		{
+
+			if (data < current->data)
+			{
+				prevCurrent->next = newNode;
+				newNode->next = current;
+				++length;
+				return;
+			}
+
+			prevCurrent = current;
+		}
+		InsertEnd(data);
+	}
 
 	~LinkedList()
 	{
@@ -216,7 +289,22 @@ int main()
 	std::println("{}", list.Get_nth(3)->data);
 	std::println("{}", list.Get_nth_Back(1)->data);
 	std::println("{}", list.Get_nth_Back(3)->data);
+	list.DeleteEvenPositions();
+	list.Print();
+
+	LinkedList<int> sortedList;
+	sortedList.InsertSorted(10);
+	sortedList.InsertSorted(2);
+	sortedList.InsertSorted(30);
+	sortedList.InsertSorted(4);
+	sortedList.InsertSorted(1);
+	sortedList.Print();
+	/*
+	list.Reverse();
+	list.Print();
 	list.DeleteFront();
+	list.Print();
+	list.SwapPairs();
 	list.Print();
 	list.DeleteEnd();
 	list.Print();
@@ -224,4 +312,5 @@ int main()
 	list.Print();
 	list.DeleteKey(25);
 	list.Print();
+	*/
 }
