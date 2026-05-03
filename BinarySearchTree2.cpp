@@ -309,8 +309,9 @@ public:
 
 
 
-int main()
+int main111()
 {
+	return 0;
 	BSTree tree;
 	tree.Insert(10);
 	tree.Insert(8);

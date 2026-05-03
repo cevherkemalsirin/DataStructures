@@ -139,6 +139,7 @@
     <ClCompile Include="FixedQueue.cpp" />
     <ClCompile Include="GeneralTrees.cpp" />
     <ClCompile Include="HashTable.cpp" />
+    <ClCompile Include="LinkedList\LinkedList.cpp" />
     <ClCompile Include="linked_list.cpp" />
     <ClCompile Include="Recursion.cpp" />
     <ClCompile Include="SortingAlgorithms.cpp" />
