@@ -1,4 +1,5 @@
 #include <print>
+#include <set>
 
 
 template <class T>
@@ -23,6 +24,25 @@ private:
 	Node<T>* head;
 	Node<T>* tail;
 	int length;
+
+
+	void DeleteNext(Node<T>* currentNode)
+	{
+		if (!currentNode || !currentNode->next) return;
+		Node<T>* tempDelete = currentNode->next;
+		if (!currentNode->next->next && tail)
+		{
+			//we remove tail
+			delete tail;
+			tail = currentNode;
+			tail->next = nullptr;
+			--length;
+			return;
+		}
+		currentNode->next = currentNode->next->next;
+		delete tempDelete;
+		--length;
+	}
 public:
 
 	LinkedList():head(nullptr),tail(nullptr),length(0){}
@@ -135,6 +155,7 @@ public:
 		Delete_nth(length);
 	}
 
+
 	void Delete_nth(int n)
 	{
 		if (length == 0 || n > length || n < 1) return;
@@ -234,7 +255,6 @@ public:
 
 	void InsertSorted(T data)
 	{
-		Node<T>* newNode = new Node<T>(data);
 		if (!head || data < head->data)
 		{
 			InsertFront(data);
@@ -246,6 +266,7 @@ public:
 
 			if (data < current->data)
 			{
+				Node<T>* newNode = new Node<T>(data);
 				prevCurrent->next = newNode;
 				newNode->next = current;
 				++length;
@@ -255,6 +276,162 @@ public:
 			prevCurrent = current;
 		}
 		InsertEnd(data);
+	}
+
+	void SwapHeadTail()
+	{
+		if (length < 2) return;
+
+		Node<T>* prevTail = Get_nth(length - 1);
+		prevTail->next = head;
+		tail->next = head->next;
+		head->next = nullptr;
+		std::swap(head, tail);
+	}
+
+	//rotate to left k times
+	void LeftRotate(int k)
+	{
+		// 1 2 3 4 5 
+		if (k < 1 || length < 2) return;
+		//if k circles,meaning k bigger than length
+		k = k % length;
+		Node<T>* cutNode = Get_nth(k);
+		tail->next = head;
+		head = cutNode->next;
+		tail = cutNode;
+		tail->next = nullptr;
+	}
+
+	void DeleteDuplicates()
+	{
+		if (!head) { return; }
+
+		std::set<T> nodeSet;
+		nodeSet.insert(head->data);
+		for (Node<T>* current = head->next, *prev = head; current;)
+		{
+			if (!nodeSet.contains(current->data))
+			{
+				nodeSet.insert(current->data);
+				current = current->next;
+				prev = prev->next;
+			}
+			else
+			{
+				current = current->next;
+				DeleteNext(prev);
+			}
+		}
+	}
+
+	//moves back all the nodes with specific keys
+	void MoveBack(T key)
+	{
+		int i = 0;
+		
+		for (Node<T>* current = head , *prev = nullptr; (i < length) && current; ++i)
+		{
+			if (key == current->data)
+			{
+				if (current == head)
+				{
+					current = head->next;
+					tail->next = head;
+					head = head->next;
+					tail->next->next = nullptr;
+					tail = tail->next;
+				}
+				else
+				{
+					prev->next = current->next;
+					tail->next = current;
+					current->next = nullptr;
+					tail = current;
+					current = prev->next;
+				}
+			}
+			else
+			{
+				prev = current;
+				current = current->next;
+			}
+		}
+	}
+
+	int FindMax(Node<T>* node)
+	{
+		if (!node) return INT_MIN;
+
+		int max = std::max(node->data,FindMax(node->next));
+		return max;
+	}
+
+	void RemoveLastOccurence(T key)
+	{
+		Node<T>* prevLastOccurence = nullptr;
+		for (Node<T>* current = head,*prev = nullptr; current; prev = current, current = current->next)
+		{
+			if (current->data == key)
+			{
+				prevLastOccurence = prev;
+			}
+		}
+		if (prevLastOccurence)
+		{
+			DeleteNext(prevLastOccurence);
+		}
+	}
+
+	//arrange odd and even positions by taking odd positions to the begining
+	void ArrangeOddEven()
+	{
+		if (length < 3) { return; }
+
+		int i = 2;
+		for (Node<T>* prev = head, *current = head->next; current; ++i)
+		{
+			if (i % 2 == 1)
+			{
+				prev->next = current->next;
+				current->next = head->next;
+				head->next = current;
+				current = prev->next;
+			}
+			else
+			{
+				prev = current;
+				current = current->next;
+			}
+		}
+	}
+	//it will modify the original linked list such that linkedlist 2 items will be added alternativly
+	void InsertAlternate(const LinkedList & linkedList2)
+	{
+		if (linkedList2.length == 0) return;
+		int minIndex = std::min(length, linkedList2.length);
+		int maxIndex = std::max(length, linkedList2.length);
+		int realIndex = linkedList2.length > minIndex ? maxIndex : minIndex;
+
+		Node<T>* current = head;
+		Node<T>* secondCurrent = linkedList2.GetHead();
+		Node<T>* newNode = nullptr;
+		for (int i = 0; i < realIndex; secondCurrent = secondCurrent->next,++i)
+		{
+			newNode = new Node<T>(secondCurrent->data);
+			if (i < minIndex)
+			{
+				newNode->next = current->next;
+				current->next = newNode;
+				//update pos
+				current = newNode->next;
+			}
+			else
+			{
+				this->InsertEnd(newNode->data);
+			}
+
+		}
 	}
 
 	~LinkedList()
@@ -283,13 +460,11 @@ int main()
 	list.InsertEnd(8);
 	list.InsertEnd(3);
 	list.InsertEnd(25);
+	list.InsertEnd(8);
 	list.InsertEnd(15);
 	list.InsertFront(11);
-	list.Print();
-	std::println("{}", list.Get_nth(3)->data);
-	std::println("{}", list.Get_nth_Back(1)->data);
-	std::println("{}", list.Get_nth_Back(3)->data);
-	list.DeleteEvenPositions();
+	list.InsertEnd(8);
+	list.InsertEnd(8);
 	list.Print();
 
 	LinkedList<int> sortedList;
@@ -299,7 +474,47 @@ int main()
 	sortedList.InsertSorted(4);
 	sortedList.InsertSorted(1);
 	sortedList.Print();
+
+	list.InsertAlternate(sortedList);
+	list.Print();
+
+
+
+
+
+
+
+
 	/*
+	//list.MoveBack(8);
+	list.Print();
+	std::println("max is: {}", list.FindMax(list.GetHead()));
+	list.ArrangeOddEven();
+	list.Print();
+	*/
+
+
+	/*
+	* 	list.RemoveLastOccurence(25);
+	list.Print();
+	std::println("{}", list.Get_nth(3)->data);
+	std::println("{}", list.Get_nth_Back(1)->data);
+	std::println("{}", list.Get_nth_Back(3)->data);
+	list.DeleteEvenPositions();
+	list.Print();
+	*/
+
+
+
+
+
+
+	/*
+	* 	sortedList.LeftRotate(1);
+	sortedList.Print();
+	sortedList.SwapHeadTail();
+	sortedList.Print();
+	
 	list.Reverse();
 	list.Print();
 	list.DeleteFront();
