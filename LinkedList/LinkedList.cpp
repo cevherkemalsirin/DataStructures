@@ -93,7 +93,7 @@ public:
 		
 	}
 
-	Node<T>* Get_nth(int n)
+	Node<T>* Get_nth(int n) const
 	{
 		if (n > length || n < 1) return nullptr;
 		int i = 1;
@@ -122,7 +122,7 @@ public:
 		++length;
 	}
 
-	Node<T>* Get_nth_Back(int n)
+	Node<T>* Get_nth_Back(int n) const
 	{
 		int index = length - (n - 1);//get real index from start based on index from back
 		return Get_nth(index);
@@ -434,6 +434,63 @@ public:
 		}
 	}
 
+	//imagine 2 int linked list one is 1,3,2 another is 4,2,1. they are in reverse order so one number is 231 another 124 so add them 355 which new linked list 4,5,3
+	void AddLinkedList(const LinkedList& linkedlist2)  // 111  9999999999
+	{
+		if (linkedlist2.length < 1) return;
+
+		int maxIndex = std::max(length, linkedlist2.Length());
+		int carry = 0;
+		int newData = 0;
+		Node<T>* current = head, * current2 = linkedlist2.GetHead();
+
+		for (int i = 0; i < maxIndex;++i)
+		{
+			if (!current)
+			{
+				if (current2)
+				{
+					newData = current2->data + carry;
+					carry = 0;
+					if (newData >= 10)
+					{
+						newData -= 10;
+						carry = 1;
+					}
+					this->InsertEnd(newData);
+				}
+
+			}
+			else
+			{
+				if (current2)
+				{
+					 newData = current->data + current2->data + carry;
+					 current2 = current2->next;
+				}
+				else
+				{
+					newData = current->data + carry;
+				}
+				carry = 0;
+				if (newData >= 10)
+				{
+					newData -= 10;
+					carry = 1;
+				}
+				current->data = newData;
+				current = current->next;
+
+			}
+
+		}
+		if (carry == 1)
+		{
+			this->InsertEnd(carry);
+		}
+		
+	}
+
 	~LinkedList()
 	{
 		while (head)
@@ -479,9 +536,27 @@ int main()
 	list.Print();
 
 
-
-
-
+	LinkedList<int> addlist;
+	addlist.InsertEnd(1);
+	addlist.InsertEnd(1);
+	addlist.Print();
+	LinkedList<int> addlist2;
+	addlist2.InsertEnd(9);
+	addlist2.InsertEnd(9);
+	addlist2.InsertEnd(9);
+	addlist2.InsertEnd(9);
+	addlist2.InsertEnd(9);
+	addlist2.InsertEnd(9);
+	addlist2.InsertEnd(9);
+	addlist2.InsertEnd(9);
+//	addlist2.InsertEnd(4);
+//	addlist2.InsertEnd(5);
+//	addlist2.InsertEnd(7);
+//	addlist2.InsertEnd(8);
+//	addlist2.InsertEnd(9);
+	addlist2.Print();
+	addlist.AddLinkedList(addlist2);
+	addlist.Print();
 
 
 
