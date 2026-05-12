@@ -491,6 +491,90 @@ public:
 		
 	}
 
+	//Given Sorted list like 1,1,1,2,2,2,3,3,3,5,6 remove all dublicates => {5,6}, ex2) 1,1-> {}
+	void RemoveSortedDublicates()
+	{
+		if (length < 2) return;
+		bool deletePrev = false;
+		Node<T>* previous = head;
+		for (Node<T>* current = head->next; current;)
+		{
+			
+			if (current->data == previous->data)
+			{
+				deletePrev = true;
+				current = current->next;
+				DeleteNext(previous);
+			}
+			else
+			{
+				if (deletePrev)
+				{
+					DeleteKey(previous->data);
+					previous = current;
+					current = current->next;
+					deletePrev = false;
+				}
+				else
+				{
+					previous = current;
+					current = current->next;
+				}
+			}
+
+
+		}
+
+		if (deletePrev)
+		{
+			DeleteKey(previous->data);
+		}
+	}
+
+
+	//you will reverse linked list in pairs, for instance 1,2,3,4,5,6 and k = 3 then 3,2,1,6,5,4
+	void ReversePairs(int k)
+	{
+		if (length < k || length < 2) return;
+		int j = 0;
+		for (Node<T>* current = head->next, *previous = head, *start = head,*prevHead = nullptr; current;)
+		{
+			for (int i = 1; i < k; ++i)
+			{
+				Node<T>* nextNode = current->next;
+				current->next = previous;
+				previous = current;
+				current = nextNode;
+			}
+
+			start->next = current;
+			
+			++j;
+			if (j == 1)
+			{
+				head = previous;
+				prevHead = start;
+			}
+			else
+			{
+				prevHead->next = previous;
+			}
+
+			if (!current)
+			{
+				tail = start;
+			}
+			else
+			{
+				prevHead = start;
+				previous = start = current;
+				current = current->next;
+				
+			}
+
+		}
+	}
+
 	~LinkedList()
 	{
 		while (head)
@@ -559,8 +643,33 @@ int main()
 	addlist.Print();
 
 
+	LinkedList<int> reverseKlist;
+	reverseKlist.InsertEnd(1);
+	reverseKlist.InsertEnd(2);
+	reverseKlist.InsertEnd(3);
+	reverseKlist.InsertEnd(4);
+	reverseKlist.InsertEnd(5);
+	reverseKlist.InsertEnd(6);
+	reverseKlist.InsertEnd(7);
+	reverseKlist.Print();
+	reverseKlist.ReversePairs(2);
+	reverseKlist.Print();
 
 	/*
+	LinkedList<int> orderedList;
+	orderedList.InsertEnd(1);
+	orderedList.InsertEnd(2);
+	orderedList.InsertEnd(2);
+	orderedList.InsertEnd(2);
+	orderedList.InsertEnd(2);
+	orderedList.InsertEnd(2);
+	orderedList.InsertEnd(2);
+	orderedList.InsertEnd(3);
+	orderedList.Print();
+	orderedList.RemoveSortedDublicates();
+	orderedList.Print();
+
+	
 	//list.MoveBack(8);
 	list.Print();
 	std::println("max is: {}", list.FindMax(list.GetHead()));
